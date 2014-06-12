@@ -1,0 +1,1 @@
+.\psake.ps1 build.ps1 -task Package -properties @{"config"="Release"}
