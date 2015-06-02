@@ -15,14 +15,16 @@ namespace CoreTechs.WiX
         private readonly List<Action<Component, XElement>> _mods = new List<Action<Component, XElement>>();
 
         /// <summary>
-        /// File names that will always be included. Overrides excluded extensions.
+        /// File name patterns that will always be included. Overrides excluded files.
+        /// Examples: something.txt, *.txt, abc*.*
         /// </summary>
         public IList<string> IncludeFiles { get; set; }
 
         /// <summary>
-        /// File extensions that will be excluded.
+        /// File path patterns that will be excluded.
+        /// Examples: something.txt, *.txt, abc*.*
         /// </summary>
-        public IList<string> ExcludeExtensions { get; set; }
+        public IList<string> ExcludeFiles { get; set; }
 
         /// <summary>
         /// The directory to get files from.
@@ -109,21 +111,7 @@ namespace CoreTechs.WiX
             return xml;
         }
 
-        private IEnumerable<Func<File, bool>> GetDefaultExclusions()
-        {
-            yield return
-                f =>
-                {
-                    if (IncludeFiles != null && IncludeFiles.Contains(f.Info.Name, StringComparer.OrdinalIgnoreCase))
-                        return false;
-
-                    return ExcludeExtensions != null &&
-                           ExcludeExtensions.Any(
-                               ext =>
-                                   f.Info.Name.EndsWith(ext.StartsWith(".") ? ext : "." + ext,
-                                       StringComparison.OrdinalIgnoreCase));
-                };
-        }
+      
 
         private XDocument ApplyXSLT(XDocument xml)
         {
@@ -152,13 +140,26 @@ namespace CoreTechs.WiX
 
         private IEnumerable<Component> GetComponents()
         {
-            var exclusions = GetDefaultExclusions().Concat(_exclusions);
 
-            return Directory
-                .EnumerateFiles("*", SearchOption.AllDirectories)
+            var files = Directory.EnumerateFiles("*", SearchOption.AllDirectories);
+
+            foreach (var exclusion in ExcludeFiles ?? new string[0])
+            {
+                files = files.Except(Directory.EnumerateFiles(exclusion, SearchOption.AllDirectories),
+                    new FilePathEqualityComparer());
+            }
+
+            var included = new List<FileInfo>();
+
+            foreach (var inclusion in IncludeFiles ?? new string[0])
+                included.AddRange(Directory.EnumerateFiles(inclusion, SearchOption.AllDirectories));
+
+            return files.Concat(included)
                 .Select(f => new File(f, this))
-                .WhereNot(f => exclusions.Any(x => x(f)))
+                .WhereNot(f => _exclusions.Any(x => x(f)))
                 .Select(x => new Component(x, this));
+            
+          
         }
 
         public Harvester ExcludeWhere(Func<File, bool> predicate)

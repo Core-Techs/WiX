@@ -14,7 +14,24 @@ namespace Tests
         {
             var h = new Harvester(@"D:\code\TrueCards\src\TrueCards\bin\Release", @"d:\users\roverby\mywixfile.wxs", "ProgramFilesDirectory","ProductComponents")
             {
-                ExcludeExtensions = new[] {"pdb", "xml", "vshost.exe", "vshost.exe.config", "vshost.exe.manifest"}
+                ExcludeFiles = new[] { "*.pdb", "*.xml", "*.vshost.exe*" }
+            }
+
+                .ModifyComponentsWhere(c => c.File.Info.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase),
+                    (c, xe) => xe.Elements(Constants.WixNs + "File").Single().Add(new XAttribute("Checksum", "yes")));
+
+            var xml = h.Harvest();
+            Console.Write(xml.ToString());
+        }
+
+        [Test]
+        public void Test2()
+        {
+            var h = new Harvester(@"D:\Code\TrueCards\src\CardFeedService\bin\x86\Release",
+                @"d:\users\roverby\mywixfile.wxs",
+                "ProgramFilesDirectory", "ProductComponents")
+            {
+                ExcludeFiles = new[] { "*.pdb", "*.xml", "*.vshost.exe*", "binnumbers.dat" }
             }
 
                 .ModifyComponentsWhere(c => c.File.Info.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase),

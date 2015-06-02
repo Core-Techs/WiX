@@ -21,7 +21,7 @@ namespace CoreTechs.WiX
         public string[] IncludeFiles { get; set; }
 
         [Parameter]
-        public string[] ExcludeExtensions { get; set; }
+        public string[] ExcludeFiles { get; set; }
 
         [Parameter]
         public string XSLTFilePath { get; set; }
@@ -34,7 +34,7 @@ namespace CoreTechs.WiX
             var h = new Harvester(DirectoryPath, WxsDestinationFilePath, DirectoryRefId, ComponentGroupId)
             {
                 IncludeFiles = IncludeFiles,
-                ExcludeExtensions = ExcludeExtensions,
+                ExcludeFiles = ExcludeFiles,
                 XSLTFilePath = XSLTFilePath,
                 Transformation = Transformation
             };

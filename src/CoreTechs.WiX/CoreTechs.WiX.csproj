@@ -39,10 +39,11 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Management.Automation" />
-    <Reference Include="CoreTechs.Common">
-      <HintPath>packages\CoreTechs.Common.4.0.0\lib\net45\CoreTechs.Common.dll</HintPath>
+    <Reference Include="CoreTechs.Common, Version=16.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CoreTechs.Common.16.0.0\lib\net45\CoreTechs.Common.dll</HintPath>
+      <Private>True</Private>
     </Reference>
+    <Reference Include="System.Management.Automation" />
     <Reference Include="Logos.Utility">
       <HintPath>packages\Logos.Utility.2.0.0\lib\net40\Logos.Utility.dll</HintPath>
     </Reference>
@@ -59,6 +60,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="File.cs" />
+    <Compile Include="FilePathEqualityComparer.cs" />
     <Compile Include="Harvester.cs" />
     <Compile Include="InvokeHarvesterCmdlet.cs" />
     <Compile Include="ITransformation.cs" />
